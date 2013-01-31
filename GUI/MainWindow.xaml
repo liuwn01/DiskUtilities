@@ -1,0 +1,115 @@
+﻿<Window x:Class="GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ignore="http://www.ignore.com" xmlns:gui="clr-namespace:GUI"
+        mc:Ignorable="d ignore"
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Background="AliceBlue"
+        Height="600" Width="800"
+        Title="Disk Utilities"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/MainSkin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="23*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="19*" />
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit" Command="{Binding CloseCommand}" />
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Defrag" IsEnabled="{Binding CanDefrag}" Command="{Binding DefragFileCommand}" />
+                <MenuItem Header="Benchmark" Command="{Binding OpenBenchmarkCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="91"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="91"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" IsEnabled="{Binding CanDefrag}" Width="75" Height="23" HorizontalAlignment="Right" Margin="8" Command="{Binding DefragFileCommand}">Defrag</Button>
+            <TextBlock Grid.Column="1" Text="{Binding FilePath}" HorizontalAlignment="Left" Margin="8" />
+            <Button Grid.Column="2" Width="75" Height="23" HorizontalAlignment="Right" Margin="8" Command="{Binding OpenFileDialogCommand}">Browse...</Button>
+        </Grid>
+
+        <gui:DefraggingUserControl Grid.Row="2" Visibility="{Binding DefragWindowVisibility}" Panel.ZIndex="100" />
+
+        <ListView ItemsSource="{Binding VolumeMap}" Grid.Row="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
+        
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Border Background="DarkGray" Width="10" Height="10" Margin="8,4,10,3" />
+            <TextBlock Text="Allocated" />
+            <Border Background="Blue" Width="10" Height="10" Margin="8,4,10,3" />
+            <TextBlock Text="Not Fragmented" />
+            <Border Background="Red" Width="10" Height="10" Margin="8,4,10,3" />
+            <TextBlock Text="Fragmented" />
+            <Border Background="Snow" Width="10" Height="10" Margin="8,4,10,3" />
+            <TextBlock Text="Free" />
+        </StackPanel>
+        
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="19*"/>
+                <ColumnDefinition Width="31*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Grid.RowSpan="2" Margin="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding Path=DiskInfo}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding Path=.}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+            <Border Grid.Column="1" Grid.Row="0" Margin="8">
+                <StackPanel Margin="8" Orientation="Horizontal">
+                    <TextBlock Text="S.M.A.R.T.:  " />
+                    <TextBlock Text="{Binding SMARTStatus}" Foreground="{Binding SMARTStatusColor}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Margin="8">
+                <DataGrid ItemsSource="{Binding SMARTData}" AutoGenerateColumns="False" CanUserResizeColumns="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Attribute" Binding="{Binding Attribute}" />
+                        <DataGridTextColumn Header="Real value" Binding="{Binding RealData}" />
+                        <DataGridTextColumn Header="Current" Binding="{Binding Current}" />
+                        <DataGridTextColumn Header="Threshold" Binding="{Binding Threshold}" />
+                        <DataGridTextColumn Header="Raw value" Binding="{Binding RawData}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
